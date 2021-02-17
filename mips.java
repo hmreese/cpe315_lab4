@@ -19,9 +19,17 @@ public class mips {
         int i = 0;
         while (i < N && pc < instruct.twoD.size())
         {
-            callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
+            String name = instruct.twoD.get(pc)[0];
+            callFunction(name, instruct.twoD.get(pc));
             i++;
             pc++;
+
+            pipeline.pipe[3] = pipeline.pipe[2];
+            pipeline.pipe[2] = pipeline.pipe[1];
+            pipeline.pipe[1] =pipeline.pipe[0];
+            pipeline.pipe[0] = name;
+            pipeline.cycles++;
+            pipeline.instructions++;
         }
     }
 
