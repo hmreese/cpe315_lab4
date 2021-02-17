@@ -6,12 +6,14 @@ public class mips {
     int reg[];
     int pc;
     object instruct;
+    pipeline pipeline;
 
     public mips(object i){
         this.mem = new int[8192];
         this.reg = new int[32];
         this.pc = 0;
         this.instruct = i;
+        this.pipeline = new pipeline();
     }
 
     public void step(int N)
