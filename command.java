@@ -119,6 +119,8 @@ public class command {
     }
     private void commandR(){
         mip.run();
+        System.out.println("\nProgram complete");
+        System.out.println("CPI = ");
     }
     private void commanddebug(int t){
         mip.debugrun(t);
