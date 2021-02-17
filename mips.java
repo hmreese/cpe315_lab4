@@ -26,12 +26,7 @@ public class mips {
             i++;
             pc++;
 
-            pipeline.pipe[3] = pipeline.pipe[2];
-            pipeline.pipe[2] = pipeline.pipe[1];
-            pipeline.pipe[1] =pipeline.pipe[0];
-            pipeline.pipe[0] = name;
-            pipeline.cycles++;
-            pipeline.instructions++;
+            pipePal(name);
         }
     }
 
@@ -39,10 +34,24 @@ public class mips {
     {
         while(pc < instruct.twoD.size())
         {
+            String name = instruct.twoD.get(pc)[0];
             callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
             pc++;
+            
+            pipePal(name);
         }
     }
+
+    public void pipePal(String name)
+    {
+        p.pipe[3] = p.pipe[2];
+        p.pipe[2] = p.pipe[1];
+        p.pipe[1] = p.pipe[0];
+        p.pipe[0] = name;
+        p.cycles++;
+        p.instructions++;
+    }
+    
     // debug code ----------------------------------------------------
     public void debugrun(int size)
     {
