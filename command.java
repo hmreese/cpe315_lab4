@@ -59,6 +59,9 @@ public class command {
             case "d":
                 dump();
                 break;
+            case "p":
+                pipeline();
+                break;
             case "s":
                 if(temp.length == 1){
                     commandS(1);
@@ -88,6 +91,7 @@ public class command {
     private void help(){
         System.out.println("\nh = show help");
         System.out.println("d = dump register state");
+        System.out.println("p = show pipeline registers");
         System.out.println("s = single step through the program (i.e. execute 1 instruction and stop)");
         System.out.println("s num = step through num instructions of the program");
         System.out.println("r = run until the program ends");
@@ -105,9 +109,13 @@ public class command {
         System.out.println("$s5 = " + mip.reg[21] +"\t\t$s6 = "+ mip.reg[22] +"\t\t$s7 = "+ mip.reg[23] +"\t\t$t8 = "+mip.reg[24]);
         System.out.println("$t9 = " + mip.reg[25] +"\t\t$sp = "+ mip.reg[29] +"\t\t$ra = "+ mip.reg[31]+"\n");
     }
+    private void pipeline(){
+        System.out.println("\npc      if/id   id/exe  exe/mem mem/wb");
+        System.out.println(mip.pc + "\tempty\tempty\tempty\tempty\n"); //replace empty with pipline regs
+    }
     private void commandS(int N){
         mip.step(N);
-        System.out.println("\t" +N+" instruction (s) executed");
+        pipeline();
     }
     private void commandR(){
         mip.run();
