@@ -98,7 +98,7 @@ public class mips {
         }
     }
 
-    // debug code -------------------------------------------------------
+    // end of debug code -------------------------------------------------------
 
     public void callFunction(String name, String[] line)
     {
