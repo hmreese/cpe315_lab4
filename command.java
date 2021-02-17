@@ -110,7 +110,7 @@ public class command {
         System.out.println("$t9 = " + mip.reg[25] +"\t\t$sp = "+ mip.reg[29] +"\t\t$ra = "+ mip.reg[31]+"\n");
     }
     private void pipeline(){
-        System.out.println("\npc      if/id   id/exe  exe/mem mem/wb");
+        System.out.println("\npc\tif/id\tid/exe\texe/mem\tmem/wb");
         System.out.println(mip.pc + "\t"+mip.p.pipe[0]+"\t"+mip.p.pipe[1]+"\t"+mip.p.pipe[2]+"\t"+mip.p.pipe[3]); //replace empty with pipline regs
     }
     private void commandS(int N){
@@ -120,7 +120,7 @@ public class command {
     private void commandR(){
         mip.run();
         System.out.println("\nProgram complete");
-        System.out.println("CPI = "+ mip.p.cycles/mip.p.instructions +"\tCycles = "+mip.p.cycles + "Instructions ="+mip.p.instructions);
+        System.out.println("CPI = "+ mip.p.cycles/mip.p.instructions +"\tCycles = "+mip.p.cycles + "\tInstructions ="+mip.p.instructions);
     }
     private void commanddebug(int t){
         mip.debugrun(t);

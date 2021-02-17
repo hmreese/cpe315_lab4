@@ -62,10 +62,12 @@ public class mips {
             FileWriter myFile = new FileWriter("debug.txt");
             while(pc < instruct.twoD.size() &&  i < size)
             {
+                String name = instruct.twoD.get(pc)[0];
                 debugdump(this, myFile);
                 callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
                 pc++;
                 i++;
+                pipePal(name);
             }
             myFile.close();
         }catch(IOException e){
@@ -85,6 +87,11 @@ public class mips {
             file.write("$s1 = " + mip.reg[17] +"|$s2 = "+ mip.reg[18] +"|$s3 = "+ mip.reg[19] +"|$s4 = "+mip.reg[20]+"\n");
             file.write("$s5 = " + mip.reg[21] +"|$s6 = "+ mip.reg[22] +"|$s7 = "+ mip.reg[23] +"|$t8 = "+mip.reg[24]+"\n");
             file.write("$t9 = " + mip.reg[25] +"|$sp = "+ mip.reg[29] +"|$ra = "+ mip.reg[31]+"\n");
+        
+            file.write("\npc\tif/id\tid/exe\texe/mem\tmem/wb\n");
+            file.write(mip.pc + "\t"+mip.p.pipe[0]+"\t"+mip.p.pipe[1]+"\t"+mip.p.pipe[2]+"\t"+mip.p.pipe[3] + "\n"); //replace empty with pipline regs
+            file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
+    
         } catch (IOException e){
             System.out.println("An error occurred on the write step.");
             e.printStackTrace();
