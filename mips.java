@@ -6,14 +6,14 @@ public class mips {
     int reg[];
     int pc;
     object instruct;
-    pipeline pipeline;
+    pipeline p;
 
     public mips(object i){
         this.mem = new int[8192];
         this.reg = new int[32];
         this.pc = 0;
         this.instruct = i;
-        this.pipeline = new pipeline();
+        this.p = new pipeline();
     }
 
     public void step(int N)
@@ -37,8 +37,9 @@ public class mips {
             String name = instruct.twoD.get(pc)[0];
             callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
             pc++;
-            
+
             pipePal(name);
+
         }
     }
 
