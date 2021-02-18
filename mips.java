@@ -26,7 +26,7 @@ public class mips {
                 if (p.delay == 7)   // lw
                 {
                     if ((instruct.twoD.get(pc)[2] == (instruct.twoD.get(pc+1)[3]) || instruct.twoD.get(pc)[3] == instruct.twoD.get(pc+1)[2]))
-                        p.delay = 1;
+                        p.delay = 2;
                     else
                         p.delay = 0;
                 }
