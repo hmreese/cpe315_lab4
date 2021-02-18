@@ -21,38 +21,35 @@ public class mips {
         int i = 0;
         while (i < N && pc < instruct.twoD.size())
         {
-            String name = instruct.twoD.get(pc)[0];
-            callFunction(name, instruct.twoD.get(pc));
+            if (p.delay == 0) {
+                p.delay = callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
+                if (p.delay == 7)   // lw
+                {
+                    if ((instruct.twoD.get(pc)[2] == (instruct.twoD.get(pc+1)[3]) || instruct.twoD.get(pc)[3] == instruct.twoD.get(pc+1)[2]))
+                        p.delay = 1;
+                    else
+                        p.delay = 0;
+                }
+
+                pc++;
+            }
+
+            simulate();
             i++;
-            pc++;
-
-            pipePal(name);
         }
     }
 
-    public void run()
-    {
-        while(pc < instruct.twoD.size())
+    public void run() {
+        while (!p.isEmpty)
         {
-            String name = instruct.twoD.get(pc)[0];
-            callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
-            pc++;
+            step(1);
+            // simulate();
 
-            pipePal(name);
-
+            //callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
+            //pc++;
         }
     }
 
-    public void pipePal(String name)
-    {
-        p.pipe[3] = p.pipe[2];
-        p.pipe[2] = p.pipe[1];
-        p.pipe[1] = p.pipe[0];
-        p.pipe[0] = name;
-        p.cycles++;
-        p.instructions++;
-    }
-    
     // debug code ----------------------------------------------------
     public void debugrun(int size)
     {
@@ -62,12 +59,10 @@ public class mips {
             FileWriter myFile = new FileWriter("debug.txt");
             while(pc < instruct.twoD.size() &&  i < size)
             {
-                String name = instruct.twoD.get(pc)[0];
                 debugdump(this, myFile);
                 callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
                 pc++;
                 i++;
-                pipePal(name);
             }
             myFile.close();
         }catch(IOException e){
@@ -87,20 +82,15 @@ public class mips {
             file.write("$s1 = " + mip.reg[17] +"|$s2 = "+ mip.reg[18] +"|$s3 = "+ mip.reg[19] +"|$s4 = "+mip.reg[20]+"\n");
             file.write("$s5 = " + mip.reg[21] +"|$s6 = "+ mip.reg[22] +"|$s7 = "+ mip.reg[23] +"|$t8 = "+mip.reg[24]+"\n");
             file.write("$t9 = " + mip.reg[25] +"|$sp = "+ mip.reg[29] +"|$ra = "+ mip.reg[31]+"\n");
-        
-            file.write("\npc\tif/id\tid/exe\texe/mem\tmem/wb\n");
-            file.write(mip.pc + "\t"+mip.p.pipe[0]+"\t"+mip.p.pipe[1]+"\t"+mip.p.pipe[2]+"\t"+mip.p.pipe[3] + "\n"); //replace empty with pipline regs
-            file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
-    
         } catch (IOException e){
             System.out.println("An error occurred on the write step.");
             e.printStackTrace();
         }
     }
 
-    // end of debug code -------------------------------------------------------
+    // debug code -------------------------------------------------------
 
-    public void callFunction(String name, String[] line)
+    public int callFunction(String name, String[] line)
     {
         switch (name){
             // R-INSTRUCTIONS
@@ -124,32 +114,30 @@ public class mips {
                 break;
             case "jr":
                 jr(line[1]);
-                break;
+                return 1;
             // I-INSTRUCTIONS
             case "addi":
                 addi(line[1], line[2], line[3]);
                 break;
             case "beq":
-                beq(line[1], line[2], line[3]);
-                break;
+                return beq(line[1], line[2], line[3]);
             case "bne":
-                bne(line[1], line[2], line[3]);
-                break;
+                return bne(line[1], line[2], line[3]);
             case "lw":
                 lw(line[1], line[2], line[3]);
-                break;
+                return 7;   // special load num
             case "sw":
                 sw(line[1], line[2], line[3]);
                 break;
             //J-INSTRUCTIONS
             case "j":
                 j(line[1]);
-                break;
+                return 1;
             case "jal":
                 jal(line[1]);
-                break;
+                return 1;
         }
-
+        return 0;
     }
 
     // R-INSTRUCTIONS
@@ -226,22 +214,30 @@ public class mips {
         reg[rt] = reg[rs] + imm;
     }
 
-    private void beq(String RT, String RS, String LABEL)
+    private int beq(String RT, String RS, String LABEL)
     {
         int rt = getRegister(RT);
         int rs = getRegister(RS);
 
-        if (reg[rs] == reg[rt])
-            pc = this.instruct.hash.get(LABEL + ":") ;
+        if (reg[rs] == reg[rt]){
+            pc = this.instruct.hash.get(LABEL + ":");
+            return 1;
+        }
+
+        return 0;
     }
 
-    private void bne(String RT, String RS, String LABEL)
+    private int bne(String RT, String RS, String LABEL)
     {
         int rt = getRegister(RT);
         int rs = getRegister(RS);
 
-        if (reg[rs] != reg[rt])
+        if (reg[rs] != reg[rt]) {
             pc = this.instruct.hash.get(LABEL + ":");
+            return 1;
+        }
+
+        return 0;
     }
 
     private void lw(String RT, String IMM, String RS)
