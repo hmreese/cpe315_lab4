@@ -19,9 +19,10 @@ public class mips {
     public void step(int N)
     {
         int i = 0;
-        while (i < N && pc < instruct.twoD.size())
+        while (i < N && !p.isEmpty)
         {
             if (p.delay == 0) {
+                p.instructions++;
                 p.delay = callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
                 if (p.delay == 7)   // lw
                 {
@@ -32,10 +33,12 @@ public class mips {
                 }
 
                 pc++;
-            }
 
+            }
             simulate();
-            
+            if(pc >= instruct.twoD.size()-1){
+                p.delay = 4;
+            }
             i++;
         }
     }
@@ -52,6 +55,7 @@ public class mips {
     }
 
     public void simulate(){
+        p.cycles++;
         if(p.delay == 1){ // j type
             
             if(p.simStep > 0){
@@ -83,7 +87,20 @@ public class mips {
             }
         
         }else if(p.delay == 3){ // branch type
-            
+            if(p.simStep > 1){
+                pipeMan(instruct.twoD.get(p.pipePC)[0]);
+                p.simStep--;
+            }else if(p.simStep == 1){
+                p.pipe[2] = "squash";
+                p.pipe[1] = "squash";
+                p.pipe[0] = "squash";
+                p.simStep = 0;
+                p.delay = 0;
+            }else{
+                pipeMan(instruct.twoD.get(p.pipePC)[0]);
+                p.simStep = 4;
+            }
+            p.pipePC++;
         
         }else if(p.delay == 4){ // emulation is done
             pipeMan("empty");
@@ -113,12 +130,9 @@ public class mips {
         try{
             int i = 0;
             FileWriter myFile = new FileWriter("debug.txt");
-            while(pc < instruct.twoD.size() &&  i < size)
-            {
+            for(i = 0; i<size; i++){
+                step(1);
                 debugdump(this, myFile);
-                callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
-                pc++;
-                i++;
             }
             myFile.close();
         }catch(IOException e){
@@ -129,15 +143,19 @@ public class mips {
 
     private void debugdump(mips mip, FileWriter file){
         try{
-            file.write("\n" + Arrays.toString(mip.instruct.twoD.get(mip.pc)));
-            file.write("\npc = " +mip.pc+"\n");
-            file.write("$0 = " + mip.reg[0] +"|$v0 = "+ mip.reg[2] +"|$v1 = "+ mip.reg[3] +"|$a0 = "+mip.reg[4]+"\n");
-            file.write("$a1 = " + mip.reg[5] +"|$a2 = "+ mip.reg[6] +"|$a3 = "+ mip.reg[7] +"|$t0 = "+mip.reg[8]+"\n");
-            file.write("$t1 = " + mip.reg[9] +"|$t2 = "+ mip.reg[10] +"|$t3 = "+ mip.reg[11] +"|$t4 = "+mip.reg[12]+"\n");
-            file.write("$t5 = " + mip.reg[13] +"|$t6 = "+ mip.reg[14] +"|$t7 = "+ mip.reg[15] +"|$s0 = "+mip.reg[16]+"\n");
-            file.write("$s1 = " + mip.reg[17] +"|$s2 = "+ mip.reg[18] +"|$s3 = "+ mip.reg[19] +"|$s4 = "+mip.reg[20]+"\n");
-            file.write("$s5 = " + mip.reg[21] +"|$s6 = "+ mip.reg[22] +"|$s7 = "+ mip.reg[23] +"|$t8 = "+mip.reg[24]+"\n");
-            file.write("$t9 = " + mip.reg[25] +"|$sp = "+ mip.reg[29] +"|$ra = "+ mip.reg[31]+"\n");
+            // file.write("\n" + Arrays.toString(mip.instruct.twoD.get(mip.pc)));
+            // file.write("\npc = " +mip.pc+"\n");
+            // file.write("$0 = " + mip.reg[0] +"|$v0 = "+ mip.reg[2] +"|$v1 = "+ mip.reg[3] +"|$a0 = "+mip.reg[4]+"\n");
+            // file.write("$a1 = " + mip.reg[5] +"|$a2 = "+ mip.reg[6] +"|$a3 = "+ mip.reg[7] +"|$t0 = "+mip.reg[8]+"\n");
+            // file.write("$t1 = " + mip.reg[9] +"|$t2 = "+ mip.reg[10] +"|$t3 = "+ mip.reg[11] +"|$t4 = "+mip.reg[12]+"\n");
+            // file.write("$t5 = " + mip.reg[13] +"|$t6 = "+ mip.reg[14] +"|$t7 = "+ mip.reg[15] +"|$s0 = "+mip.reg[16]+"\n");
+            // file.write("$s1 = " + mip.reg[17] +"|$s2 = "+ mip.reg[18] +"|$s3 = "+ mip.reg[19] +"|$s4 = "+mip.reg[20]+"\n");
+            // file.write("$s5 = " + mip.reg[21] +"|$s6 = "+ mip.reg[22] +"|$s7 = "+ mip.reg[23] +"|$t8 = "+mip.reg[24]+"\n");
+            // file.write("$t9 = " + mip.reg[25] +"|$sp = "+ mip.reg[29] +"|$ra = "+ mip.reg[31]+"\n");
+        
+            file.write("\npc\tif/id\tid/exe\texe/mem\tmem/wb\n");
+            file.write(p.pipePC + "\t"+p.pipe[0]+"\t"+p.pipe[1]+"\t"+p.pipe[2]+"\t"+p.pipe[3]+"\n"); //replace empty with pipline regs
+     
         } catch (IOException e){
             System.out.println("An error occurred on the write step.");
             e.printStackTrace();

@@ -95,7 +95,7 @@ public class command {
         System.out.println("s = single step through the program (i.e. execute 1 instruction and stop)");
         System.out.println("s num = step through num instructions of the program");
         System.out.println("r = run until the program ends");
-        System.out.println("m  num1 num2 = display data memory from location num1 to num2");
+        System.out.println("m = num1 num2 = display data memory from location num1 to num2");
         System.out.println("c = clear all registers, memory, and the program counter to 0");
         System.out.println("q = exit the program\n");
     }
@@ -120,7 +120,7 @@ public class command {
     private void commandR(){
         mip.run();
         System.out.println("\nProgram complete");
-        System.out.println("CPI = "+ mip.p.cycles/mip.p.instructions +"\tCycles = "+mip.p.cycles + "\tInstructions ="+mip.p.instructions);
+        System.out.println("CPI = "+ (float)mip.p.cycles/mip.p.instructions +"\tCycles = "+mip.p.cycles + "\tInstructions ="+mip.p.instructions);
     }
     private void commanddebug(int t){
         mip.debugrun(t);
