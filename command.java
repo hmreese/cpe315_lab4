@@ -111,7 +111,7 @@ public class command {
     }
     private void pipeline(){
         System.out.println("\npc\tif/id\tid/exe\texe/mem\tmem/wb");
-        System.out.println(mip.pc + "\t"+mip.p.pipe[0]+"\t"+mip.p.pipe[1]+"\t"+mip.p.pipe[2]+"\t"+mip.p.pipe[3]); //replace empty with pipline regs
+        System.out.println(mip.p.pipePC + "\t"+mip.p.pipe[0]+"\t"+mip.p.pipe[1]+"\t"+mip.p.pipe[2]+"\t"+mip.p.pipe[3]+"\n"); //replace empty with pipline regs
     }
     private void commandS(int N){
         mip.step(N);

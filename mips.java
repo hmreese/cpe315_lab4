@@ -25,7 +25,7 @@ public class mips {
                 p.delay = callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
                 if (p.delay == 7)   // lw
                 {
-                    if ((instruct.twoD.get(pc)[2] == (instruct.twoD.get(pc+1)[3]) || instruct.twoD.get(pc)[3] == instruct.twoD.get(pc+1)[2]))
+                    if (instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[3]) || instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[2]))
                         p.delay = 2;
                     else
                         p.delay = 0;
@@ -35,6 +35,7 @@ public class mips {
             }
 
             simulate();
+            
             i++;
         }
     }
@@ -48,6 +49,61 @@ public class mips {
             //callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
             //pc++;
         }
+    }
+
+    public void simulate(){
+        if(p.delay == 1){ // j type
+            
+            if(p.simStep > 0){
+                pipeMan("squash");
+                p.simStep = 0;
+                p.delay = 0;
+            }else{
+                pipeMan(instruct.twoD.get(p.pipePC)[0]);
+                p.simStep = 1;
+            }
+            p.pipePC++;
+        
+        }else if(p.delay == 2 || p.lw){  // lw type
+            if(p.delay == 2 && p.lw == false){
+                p.delay = 0;
+                pipeMan(instruct.twoD.get(p.pipePC)[0]);
+                p.pipePC++;
+                p.lw = true;
+            }else if(p.delay == 0 && p.lw == true){
+                p.delay = 2;
+                pipeMan(instruct.twoD.get(p.pipePC)[0]);
+                p.pipePC++;
+            }else{
+                p.lw = false;
+                p.delay = 0;
+                p.pipe[3] = p.pipe[2];
+                p.pipe[2] = p.pipe[1];
+                p.pipe[1] = "stall";
+            }
+        
+        }else if(p.delay == 3){ // branch type
+            
+        
+        }else if(p.delay == 4){ // emulation is done
+            pipeMan("empty");
+            p.simStep++;
+            if(p.simStep == 4){
+                p.isEmpty = true;
+            }
+            
+        }else{
+            p.pipePC = pc;
+            pipeMan(instruct.twoD.get(pc)[0]);
+        }
+        
+    }
+
+    private void pipeMan(String name){
+        p.pipe[3] = p.pipe[2];
+        p.pipe[2] = p.pipe[1];
+        p.pipe[1] = p.pipe[0];
+        p.pipe[0] = name;
     }
 
     // debug code ----------------------------------------------------
@@ -221,7 +277,7 @@ public class mips {
 
         if (reg[rs] == reg[rt]){
             pc = this.instruct.hash.get(LABEL + ":");
-            return 1;
+            return 3;
         }
 
         return 0;
@@ -234,7 +290,7 @@ public class mips {
 
         if (reg[rs] != reg[rt]) {
             pc = this.instruct.hash.get(LABEL + ":");
-            return 1;
+            return 3;
         }
 
         return 0;
