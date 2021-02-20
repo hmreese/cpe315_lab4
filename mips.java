@@ -22,17 +22,30 @@ public class mips {
         while (i < N && !p.isEmpty)
         {
             if (p.delay == 0) {
-                p.instructions++;
+                System.out.println("Instr Executing: " + instruct.twoD.get(pc)[0]);
+
                 p.delay = callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
+
+                p.instructions++;
+                System.out.println("Instr # Executed: " + p.instructions);
                 if (p.delay == 7)   // lw
                 {
-                    if (instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[3]) || instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[2]))
+                    // r-instr
+                    if (instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[2]) || instruct.twoD.get(pc)[3].equals(instruct.twoD.get(pc+1)[3]))
+                        p.delay = 2;
+                    // i-inst
+                    else if (instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[2]) || instruct.twoD.get(pc)[2].equals(instruct.twoD.get(pc+1)[1]))
                         p.delay = 2;
                     else
                         p.delay = 0;
+
+                    System.out.println("Delay: " + p.delay);
                 }
+                System.out.println("Actual pc: " + pc);
                 pc++;
+
             }
+
             simulate();
             if(pc >= instruct.twoD.size()-1){
                 p.delay = 4;
@@ -55,20 +68,18 @@ public class mips {
     public void simulate(){
         p.cycles++;
         if(p.delay == 1){ // j type
-            
+
             if(p.simStep > 0){
                 pipeMan("squash");
                 p.simStep = 0;
                 p.delay = 0;
-                
             }else{
                 pipeMan(instruct.twoD.get(p.pipePC)[0]);
+                System.out.println("pipe pc ref: " + p.pipePC);
                 p.simStep = 1;
-                
             }
             p.pipePC++;
-            
-        
+
         }else if(p.delay == 2 || p.lw){  // lw type
             if(p.delay == 2 && p.lw == false){
                 p.delay = 0;
@@ -86,7 +97,7 @@ public class mips {
                 p.pipe[2] = p.pipe[1];
                 p.pipe[1] = "stall";
             }
-        
+
         }else if(p.delay == 3){ // branch type
             if(p.simStep > 1){
                 pipeMan(instruct.twoD.get(p.pipePC)[0]);
@@ -102,20 +113,19 @@ public class mips {
                 p.simStep = 4;
             }
             p.pipePC++;
-        
+
         }else if(p.delay == 4){ // emulation is done
             pipeMan("empty");
             p.simStep++;
             if(p.simStep == 4){
                 p.isEmpty = true;
             }
-            
+
         }else{
-            
             pipeMan(instruct.twoD.get(p.pipePC)[0]);
             p.pipePC = pc;
         }
-        
+
     }
 
     private void pipeMan(String name){
@@ -154,10 +164,10 @@ public class mips {
             // file.write("$s1 = " + mip.reg[17] +"|$s2 = "+ mip.reg[18] +"|$s3 = "+ mip.reg[19] +"|$s4 = "+mip.reg[20]+"\n");
             // file.write("$s5 = " + mip.reg[21] +"|$s6 = "+ mip.reg[22] +"|$s7 = "+ mip.reg[23] +"|$t8 = "+mip.reg[24]+"\n");
             // file.write("$t9 = " + mip.reg[25] +"|$sp = "+ mip.reg[29] +"|$ra = "+ mip.reg[31]+"\n");
-        
+
             file.write("\npc\tif/id\tid/exe\texe/mem\tmem/wb\n");
             file.write(p.pipePC + "\t"+p.pipe[0]+"\t"+p.pipe[1]+"\t"+p.pipe[2]+"\t"+p.pipe[3]+"\n"); //replace empty with pipline regs
-     
+
         } catch (IOException e){
             System.out.println("An error occurred on the write step.");
             e.printStackTrace();
@@ -296,7 +306,7 @@ public class mips {
         int rs = getRegister(RS);
 
         if (reg[rs] == reg[rt]){
-            pc = this.instruct.hash.get(LABEL + ":");
+            pc = this.instruct.hash.get(LABEL + ":")-1;
             return 3;
         }
 
@@ -309,7 +319,7 @@ public class mips {
         int rs = getRegister(RS);
 
         if (reg[rs] != reg[rt]) {
-            pc = this.instruct.hash.get(LABEL + ":");
+            pc = this.instruct.hash.get(LABEL + ":")-1;
             return 3;
         }
 
