@@ -33,10 +33,11 @@ public class mips {
                 }
                 pc++;
             }
-            simulate();
-            if(pc >= instruct.twoD.size()-1){
+            if(pc == instruct.twoD.size()-1){
                 p.delay = 4;
             }
+            simulate();
+
             i++;
         }
     }
@@ -60,13 +61,13 @@ public class mips {
                 pipeMan("squash");
                 p.simStep = 0;
                 p.delay = 0;
-                
+                p.pipePC = pc;
             }else{
                 pipeMan(instruct.twoD.get(p.pipePC)[0]);
                 p.simStep = 1;
-                
+                p.pipePC++;
             }
-            p.pipePC++;
+            
             
         
         }else if(p.delay == 2 || p.lw){  // lw type
@@ -91,17 +92,20 @@ public class mips {
             if(p.simStep > 1){
                 pipeMan(instruct.twoD.get(p.pipePC)[0]);
                 p.simStep--;
+                p.pipePC++;
             }else if(p.simStep == 1){
                 p.pipe[2] = "squash";
                 p.pipe[1] = "squash";
                 p.pipe[0] = "squash";
                 p.simStep = 0;
                 p.delay = 0;
+                p.pipePC = pc;
             }else{
                 pipeMan(instruct.twoD.get(p.pipePC)[0]);
                 p.simStep = 4;
+                p.pipePC++;
             }
-            p.pipePC++;
+            
         
         }else if(p.delay == 4){ // emulation is done
             pipeMan("empty");
@@ -296,7 +300,7 @@ public class mips {
         int rs = getRegister(RS);
 
         if (reg[rs] == reg[rt]){
-            pc = this.instruct.hash.get(LABEL + ":");
+            pc = this.instruct.hash.get(LABEL + ":") - 1;
             return 3;
         }
 
@@ -309,7 +313,7 @@ public class mips {
         int rs = getRegister(RS);
 
         if (reg[rs] != reg[rt]) {
-            pc = this.instruct.hash.get(LABEL + ":");
+            pc = this.instruct.hash.get(LABEL + ":") - 1;
             return 3;
         }
 
