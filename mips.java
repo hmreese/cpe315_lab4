@@ -21,19 +21,22 @@ public class mips {
         int i = 0;
         while (i < N && !p.isEmpty)
         {
-            if (p.delay == 0) {
+            if (p.delay == 0 && pc < instruct.twoD.size()) {
                 p.instructions++;
                 p.delay = callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
                 if (p.delay == 7)   // lw
                 {
-                    if (instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[3]) || instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[2]))
+                    if ((instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[3]) || instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[2]))&&!instruct.twoD.get(pc)[1].equals("$0")&&!instruct.twoD.get(pc)[1].equals("$zero")){
                         p.delay = 2;
-                    else
+                    }else
                         p.delay = 0;
                 }
                 pc++;
+                if(pc == instruct.twoD.size()){
+                    p.simStep = 0;
+                }
             }
-            if(pc == instruct.twoD.size()-1){
+            if(pc == instruct.twoD.size()){
                 p.delay = 4;
             }
             p.cycles++;
@@ -83,7 +86,6 @@ public class mips {
                 pipeMan(instruct.twoD.get(p.pipePC)[0]);
                 p.pipePC++;
             }else{
-                
                 p.lw = false;
                 p.delay = 0;
                 p.pipe[3] = p.pipe[2];
