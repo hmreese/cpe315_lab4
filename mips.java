@@ -50,7 +50,7 @@ public class mips {
         }
     }
 
-    public void checkLoadHazard(String[] loadline, String[] nextline)
+    public int checkLoadHazard(String[] loadline, String[] nextline)
     {
         // RT IS $0
         if (loadline[1].equals("$0") || loadline[1].equals("$zero"))
