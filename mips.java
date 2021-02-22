@@ -23,14 +23,12 @@ public class mips {
             if (p.delay == 0 && pc < instruct.twoD.size()) {
                 p.instructions++;
                 p.delay = callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
-                if (p.delay == 7)   // lw
-                {
-                    if ((instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[3]) || instruct.twoD.get(pc)[1].equals(instruct.twoD.get(pc+1)[2]))&&!instruct.twoD.get(pc)[1].equals("$0")&&!instruct.twoD.get(pc)[1].equals("$zero")){
-                        p.delay = 2;
-                    }else
-                        p.delay = 0;
+                // LW
+                if (p.delay == 7){
+                    p.delay = checkLoadHazard(instruct.twoD.get(pc), instruct.twoD.get(pc+1));
                 }
                 pc++;
+                
                 if(pc == instruct.twoD.size()){
                     p.simStep = 0;
                 }
@@ -49,13 +47,21 @@ public class mips {
         while (!p.isEmpty)
         {
             step(1);
-            // simulate();
-
-            //callFunction(instruct.twoD.get(pc)[0], instruct.twoD.get(pc));
-            //pc++;
         }
     }
 
+    public void checkLoadHazard(String[] loadline, String[] nextline)
+    {
+        // RT IS $0
+        if (loadline[1].equals("$0") || loadline[1].equals("$zero"))
+            return 0;
+        // RT CANNOT BE USED IN NEXT LINE'S RS OR RT
+        if ((loadline[1].equals(nextline[2]) || loadline[1].equals(nextline[3])))
+            return 2;
+        else
+            return 0;
+    }
+    
     public void simulate(){
         
         if(p.delay == 1){ // j type
