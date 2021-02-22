@@ -36,6 +36,7 @@ public class mips {
             if(pc == instruct.twoD.size()-1){
                 p.delay = 4;
             }
+            p.cycles++;
             simulate();
 
             i++;
@@ -54,7 +55,7 @@ public class mips {
     }
 
     public void simulate(){
-        p.cycles++;
+        
         if(p.delay == 1){ // j type
             
             if(p.simStep > 0){
@@ -71,6 +72,7 @@ public class mips {
             
         
         }else if(p.delay == 2 || p.lw){  // lw type
+            
             if(p.delay == 2 && p.lw == false){
                 p.delay = 0;
                 pipeMan(instruct.twoD.get(p.pipePC)[0]);
@@ -81,6 +83,7 @@ public class mips {
                 pipeMan(instruct.twoD.get(p.pipePC)[0]);
                 p.pipePC++;
             }else{
+                
                 p.lw = false;
                 p.delay = 0;
                 p.pipe[3] = p.pipe[2];
@@ -94,6 +97,7 @@ public class mips {
                 p.simStep--;
                 p.pipePC++;
             }else if(p.simStep == 1){
+                p.pipe[3] = p.pipe[2];
                 p.pipe[2] = "squash";
                 p.pipe[1] = "squash";
                 p.pipe[0] = "squash";
@@ -102,15 +106,23 @@ public class mips {
                 p.pipePC = pc;
             }else{
                 pipeMan(instruct.twoD.get(p.pipePC)[0]);
-                p.simStep = 4;
+                p.simStep = 3;
                 p.pipePC++;
             }
             
         
         }else if(p.delay == 4){ // emulation is done
-            pipeMan("empty");
+            if(p.simStep == 0){
+
+                pipeMan(instruct.twoD.get(p.pipePC)[0]);
+                p.pipePC = pc;
+            }
+            else{
+                pipeMan("empty");
+            }
             p.simStep++;
-            if(p.simStep == 4){
+            
+            if(p.simStep == 5){
                 p.isEmpty = true;
             }
             
