@@ -11,7 +11,7 @@ public class pipeline {
     public pipeline()
     {
         this.pipe = new String[4];
-        this.cycles = 0;
+        this.cycles = 1;
         this.instructions = 1;
         this.pipePC = 0;
         this.delay = 0;
