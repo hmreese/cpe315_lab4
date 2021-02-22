@@ -120,7 +120,7 @@ public class command {
     private void commandR(){
         mip.run();
         System.out.println("\nProgram complete");
-        System.out.println("CPI = "+ (float)mip.p.cycles/mip.p.instructions +"\tCycles = "+mip.p.cycles + "\tInstructions = "+mip.p.instructions);
+        System.out.format("CPI = %.3f\tCycles = "+mip.p.cycles + "\tInstructions = "+mip.p.instructions+"\n", (float)mip.p.cycles/mip.p.instructions);
     }
     private void commanddebug(int t){
         mip.debugrun(t);
